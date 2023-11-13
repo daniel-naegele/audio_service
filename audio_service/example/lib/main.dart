@@ -21,6 +21,7 @@ import 'dart:async';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_service_example/common.dart';
+import 'package:audio_service_example/cover_art_content_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
@@ -172,16 +173,20 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     // playback state changes as they happen via playbackState...
     _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
     // ... and also the current media item via mediaItem.
-    mediaItem.add(_item);
+    _setMediaItem();
 
     // Load the player.
     _player.setAudioSource(AudioSource.uri(Uri.parse(_item.id)));
   }
 
-  // In this simple example, we handle only 4 actions: play, pause, seek and
-  // stop. Any button press from the Flutter UI, notification, lock screen or
-  // headset will be routed through to these 4 methods so that you can handle
-  // your audio playback logic in one place.
+  Future<void> _setMediaItem() async {
+    const assetName = 'assets/ScienceFriday_WNYCStudios_1400.jpg';
+
+    final contentUri = CoverArtContentProvider.instance.generateContentUriFromAsset(assetName);
+
+    print(contentUri);
+    mediaItem.add(_item.copyWith(artUri: contentUri));
+  }
 
   @override
   Future<void> play() => _player.play();
